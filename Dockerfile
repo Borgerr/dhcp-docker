@@ -5,5 +5,8 @@ RUN apt update && apt install -y isc-dhcp-server tcpdump
 
 COPY ["./dhcpd.conf", "/etc/dhcp/dhcpd.conf"]
 
+# lease database just needs to exist
+RUN touch /var/lib/dhcp/dhcpd.leases
+
 CMD ["dhcpd", "-f", "-d", "-cf", "/etc/dhcp/dhcpd.conf", "eth0"]
 
