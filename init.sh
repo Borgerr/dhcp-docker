@@ -14,7 +14,7 @@ else
     fi
 
     # Listening IP info
-    : ${SN1:='10.1.1.0'}
+    : ${SN1:='10.0.0.0'}
     : ${NM1:='255.255.255.0'}
 
     # Empty definition for subnet
@@ -22,8 +22,8 @@ else
     : ${NM2:='255.255.0.0'}
 
     # IP Lease range
-    : ${LEASE_RANGE_START:='10.1.1.3'}
-    : ${LEASE_RANGE_END:='10.1.1.254'}
+    : ${LEASE_RANGE_START:='10.0.0.3'}
+    : ${LEASE_RANGE_END:='10.0.0.254'}
 
     # Lease time
     : ${DEFAULT_LEASE_TIME:='600'}
@@ -33,7 +33,7 @@ else
     : ${DOMAIN_NAME_SERVERS:='8.8.8.8'} # google DNS
 
     # Default gateway
-    : ${DEFAULT_GATEWAY:='10.1.1.1'}
+    : ${DEFAULT_GATEWAY:='10.0.0.1'}    # TODO: maybe revisit
 
     # Write to dhcpd.conf
     touch dhcpd.conf
@@ -61,6 +61,12 @@ else
 
 fi
 
-docker build --tag "dhcp" .
-docker run --detach "dhcp"
+: ${IF_DEFAULT:='eth0'}
+docker build --tag "dhcp" . \
+    --build-arg INTERFACE=$IF_DEFAULT
+docker run --rm \
+    --network host \
+    --cap-add=NET_ADMIN \
+    --cap-add=NET_RAW \
+    --detach "dhcp"
 
